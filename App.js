@@ -1,20 +1,34 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import Home from './views/Home';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import List from './views/List';
+import {NativeBaseProvider} from 'native-base'
+import Course from './views/Course';
+import Compte from './views/Compte';
+
+const Tab = createBottomTabNavigator();
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+  return (
+    <NativeBaseProvider>
+      <NavigationContainer>
+        <Tab.Navigator screenOptions={{
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: '#000',
+            color: '#fff'
+          },
+          tabBarIconStyle: {
+            display: 'none'
+          },
+        }} initialRouteName='Budget'>
+          <Tab.Screen name="Compte" component={Compte} />
+          <Tab.Screen name="Budget" component={Home} />
+          <Tab.Screen name="Liste" component={List} />
+          <Tab.Screen name="Course" component={Course} />
+        </Tab.Navigator>
+      </NavigationContainer>
+    </NativeBaseProvider>
+  )
+}
