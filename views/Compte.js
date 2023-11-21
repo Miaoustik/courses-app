@@ -29,14 +29,18 @@ export default function () {
 
     return (
         <Flex paddingTop={6} justifyContent={'end'} w={"full"}  h={'full'} bg='black' alignItems={'center'}>
-            <Box w={'full'} paddingX={5} paddingTop={10} paddingBottom={10} >
-                <HStack space={3} w={'full'} alignItems={'center'} marginBottom={5}>
-                    <Text color={'white'}>Salaire : </Text>
-                    <Input value={rsa.toString()} onSubmitEditing={handleSubmitRsa} onChangeText={setRsa} w={'30%'} keyboardType="numeric" color={'white'}/>
+            <Box w={'full'} h={'full'} paddingX={5} paddingTop={2} paddingBottom={10} >
+            <Text textAlign={'center'} fontSize={20} color={'white'} marginBottom={5}>Compte</Text>
+                <HStack space={3} w={'full'} alignItems={'center'} justifyContent={'space-between'} marginBottom={5}>
+                    <Text fontSize={'20'} color={'white'}>Salaire : </Text>
+                    <Flex w={'40%'} direction="row" alignItems={'center'} paddingRight={5}>
+                        <Input borderColor={'green.500'} fontSize={20} value={rsa.toString()} onSubmitEditing={handleSubmitRsa} onChangeText={setRsa}  textAlign={'center'} keyboardType="numeric" color={'white'}/>
+                        <Text marginLeft={1} fontSize={20} color={'white'}>€</Text>
+                    </Flex>
                 </HStack>
                 <ArticleRows data={compte} dbKey={'compte'} />
             </Box>
-            <StatusBar barStyle={'light-content'} />
+            <StatusBar barStyle={'light-content'} backgroundColor={'black'} />
         </Flex>
     )
 }

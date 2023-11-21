@@ -8,7 +8,7 @@ import { calcListTotal } from "../utils/calc";
 
 export default function List () {
 
-    const budgetMoisRef = useRef(0)
+    const [budgetMois, setBudgetMois] = useState(0)
     const [list, setList] = useState([])
 
     const [total, setTotal] = useState(0)
@@ -16,25 +16,30 @@ export default function List () {
     useFocusEffect(useCallback(() => {
         (async () => {
             try {
-                budgetMoisRef.current = await get('budgetMois') ?? 0
+                const budget = await get('budgetMois') ?? 0
+                setBudgetMois(budget)
                 const list = await get('list') ?? []
                 setList(list)
-                updateTotal(list)
+                updateTotal(list, budget)
             } catch (e) { console.error(e) }
         })()
     }, []))
 
-    const updateTotal = async (data) => {
-        setTotal(calcListTotal(data, budgetMoisRef.current))
+    const updateTotal = async (data, budget) => {
+        setTotal(calcListTotal(data, budget))
     }
 
     return (
         <Flex paddingTop={6} justifyContent={'end'} w={"full"}  h={'full'} bg='black' alignItems={'center'}>
-            <Box w={'full'} paddingX={5} paddingTop={10} paddingBottom={4} >
-                <Text color={'white'} mb={5} fontSize={"lg"} >Il reste {priceFormater(total)}</Text>
-                <ArticleRows data={list} afterChange={updateTotal} dbKey={'list'} />
+            <Box w={'full'} h={'full'} paddingX={5} paddingTop={2} paddingBottom={10} >
+                <Text textAlign={'center'} fontSize={20} color={'white'} marginBottom={5}>Budget</Text>
+                <Flex direction="row" justifyContent={'space-between'} paddingRight={2}>
+                    <Text color={'white'}>Total : <Text color={'cyan.500'} fontSize={20}>{priceFormater(budgetMois)}</Text> </Text>
+                    <Text marginBottom={5} color={'white'}>Disponible : <Text color={total < 0 ? 'red.500' : 'green.500'} fontSize={20}>{priceFormater(total)}</Text></Text>
+                </Flex>
+                <ArticleRows data={list} afterChange={(data) => updateTotal(data, budgetMois)} dbKey={'list'} />
             </Box>
-            <StatusBar barStyle={"light-content"} />
+            <StatusBar barStyle={"light-content"} backgroundColor={'black'}/>
         </Flex>
     )
 }

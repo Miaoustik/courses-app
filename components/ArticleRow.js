@@ -1,9 +1,9 @@
 import { Checkbox, Text, HStack, IconButton, Icon, VStack, Flex } from "native-base";
-import { AntDesign } from '@expo/vector-icons';
 import priceFormater from "../utils/priceFormater";
 import priceToFloat from "../utils/priceToFloat";
+import { AntDesign } from '@expo/vector-icons';
 
-export default function ArticleRow ({ name, price, checked, onDelete, onUpdate, course = false, quantity = null }) {
+export default function ArticleRow ({ name, price, checked, onDelete, onUpdate, onCheck, course = false, quantity = null }) {
 
     const totalPrice = priceToFloat(price) * parseInt(quantity)
     
@@ -11,7 +11,7 @@ export default function ArticleRow ({ name, price, checked, onDelete, onUpdate, 
     return (
         <HStack w={'full'} paddingTop={6} paddingBottom={6} borderTopWidth={1} borderTopColor={'white'} space={3} alignItems={'center'}>
 
-            <Checkbox defaultIsChecked={checked} w={'20%'} size={'lg'} bgColor={'black'} aria-label="acheté" />
+            <Checkbox defaultIsChecked={checked} w={'20%'} size={'lg'} bgColor={'black'} aria-label="acheté" onChange={onCheck} />
 
             <Text onLongPress={onUpdate} w={course === true ? '40%' : '50%'}  wordWrap={'break-word'} color={'white'} >{name}</Text>
 
@@ -30,7 +30,7 @@ export default function ArticleRow ({ name, price, checked, onDelete, onUpdate, 
 
             
 
-            <IconButton onPress={onDelete} w={'10%'} size="sm" icon={<Icon as={AntDesign} name="minus"  size="sm" color="white" />} />
+            <IconButton onPress={onDelete} w={'15%'} size="sm" icon={<AntDesign name="delete" size={24} color="#d17d2a" />} />
             
         </HStack>
     )

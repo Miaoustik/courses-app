@@ -19,6 +19,11 @@ export default function (dbKey, data = [], afterChange = null) {
     const [adding, setAdding] = useState(false)
     const oldRowsRef = useRef([])
 
+
+    useFocusEffect(useCallback(() => {
+        setAdding(false)
+    }, []))
+
     useEffect(() => {
         buildRows(data)
     }, [data])
@@ -40,10 +45,27 @@ export default function (dbKey, data = [], afterChange = null) {
         setRows(() => {
             const n = []
             data.forEach(el => {
-                n.push(<ArticleRow course={dbKey === 'course'} onUpdate={() => handlePressUpdate(el.id)} checked={el.checked} quantity={el.quantity} key={el.id} name={el.name} price={priceFormater(el.price)} id={el.id} onDelete={() => handleDelete(el.id)} />)
+                n.push(<ArticleRow onCheck={(checked) => handleCheck(checked, el.id)} course={dbKey === 'course'} onUpdate={() => handlePressUpdate(el.id)} checked={el.checked} quantity={el.quantity} key={el.id} name={el.name} price={priceFormater(el.price)} id={el.id} onDelete={() => handleDelete(el.id)} />)
             })
             return n
         })
+    }
+
+    const handleCheck = async (checked, id) => {
+        try {
+            const data = await get(dbKey) ?? []
+
+            const newArray = data.map(el => {
+                if (parseInt(el.id) === parseInt(id)) {
+                    return {...el, checked}
+                }
+                return el
+            })
+
+            save(dbKey, newArray)
+        } catch (e) {
+            console.error(e.message)
+        }
     }
 
     const handleAddOk = async (name, price, quantity = null) => {

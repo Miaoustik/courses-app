@@ -39,12 +39,15 @@ export default function () {
 
     return (
         <Flex paddingTop={6} justifyContent={'end'} w={"full"}  h={'full'} bg='black' alignItems={'center'}>
-            <Box w={'full'} paddingX={5} paddingTop={10} paddingBottom={10} >
-                <Text color={'white'}>Argent course total : {priceFormater(budgetCourseRef.current)} </Text>
-                <Text marginBottom={5} color={'white'}>Argent course disponible : {priceFormater(totalCourse)}</Text>
+            <Box w={'full'} paddingX={5} paddingTop={2} paddingBottom={20} >
+                <Text textAlign={'center'} fontSize={20} color={'white'} marginBottom={5}>Course</Text>
+                <Flex direction="row" justifyContent={'space-between'} paddingRight={2}>
+                    <Text color={'white'}>Total : <Text color={'cyan.500'} fontSize={20}>{priceFormater(budgetCourseRef.current)}</Text> </Text>
+                    <Text marginBottom={5} color={'white'}>Disponible : <Text color={totalCourse < 0 ? 'red.500' : 'green.500'} fontSize={20}>{priceFormater(totalCourse)}</Text></Text>
+                </Flex>
                 <ArticleRows data={course} afterChange={updateCourse} dbKey={'course'} />
             </Box>
-            <StatusBar barStyle={'light-content'} />
+            <StatusBar barStyle={'light-content'} backgroundColor={'black'}/>
     </Flex>
     )
 }

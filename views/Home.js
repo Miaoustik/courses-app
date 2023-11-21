@@ -2,9 +2,10 @@ import { useCallback, useRef, useState } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { get, save } from "../database/storage";
 import { useFocusEffect } from "@react-navigation/native";
-import { Box, Checkbox, Flex, Input, StatusBar, Text } from "native-base";
+import { Box, Checkbox, Flex, HStack, Input, StatusBar, Text, VStack } from "native-base";
 import priceFormater from "../utils/priceFormater";
 import { calcCourseFromList, calcListCourseTotal, calcListTotal, calcRsaCompte } from "../utils/calc";
+import PriceSentence from "../components/PriceSentence";
 
 export default function Home () {
 
@@ -14,12 +15,21 @@ export default function Home () {
   const [courseBudget, setCourseBudget] = useState(0)
   const [availableCourse, setAvailableCourse] = useState(0)
 
-  //Add storage budgetmois checked if not checked calc rsacompte else get budgetMois in focuseffect
-
+  //Save checked article row, couleur des totaux, la barre blanche.
+  // manuel bug nan
+  // manuel update course
   const listRef = useRef([])
   const compteRef = useRef([])
   const rsaRef = useRef(0)
   const courseRef = useRef([])
+
+  const updateCourse = (budget) => {
+    const courseBudget = calcCourseFromList(listRef.current, budget)
+    setCourseBudget(courseBudget)
+
+    const availableCourse = calcListCourseTotal(courseRef.current, courseBudget)
+    setAvailableCourse(availableCourse)
+  }
 
   useFocusEffect(useCallback(() => {
 
@@ -33,7 +43,7 @@ export default function Home () {
 
         
         const checked = await get('checked') ?? false
-
+        setChecked(checked)
         let budget
         
         budget = await get('budgetMois')
@@ -46,12 +56,7 @@ export default function Home () {
         }
         updateTotal(budget)  
         
-        
-        const courseBudget = calcCourseFromList(listRef.current, budget)
-        setCourseBudget(courseBudget)
-
-        const availableCourse = calcListCourseTotal(courseRef.current, courseBudget)
-        setAvailableCourse(availableCourse)
+        updateCourse(budget)
 
       } catch (e) {
         console.error(e.message);
@@ -61,6 +66,7 @@ export default function Home () {
 
   const handleChange = (e) => {
     updateTotal(e)
+    updateCourse(e)
     setBudgetMois(e)
   }
 
@@ -86,13 +92,13 @@ export default function Home () {
     }
   }
 
-  const handleCheck = (e) => {
+  const handleCheck = async (e) => {
     setChecked(e)
     save('checked', e)
-
     if (e === false) {
-      const budget = calcTotal()
+      const budget = await calcTotal()
       updateTotal(budget)
+      updateCourse(budget)
     }
   }
 
@@ -101,25 +107,31 @@ export default function Home () {
       <Box w={'full'} paddingX={5} paddingTop={10} paddingBottom={10} >
         <Box borderWidth={1} borderColor={'white'} padding={3} borderRadius={20}>
           <Text fontSize={'20'} color={'white'}>Budget du mois</Text>
-          <Text fontSize={'40'} color={'white'}>{priceFormater(budgetMois)}</Text>
+          <Text fontSize={'40'} color={'cyan.500'}>{priceFormater(budgetMois)}</Text>
 
           <Checkbox marginTop={5} onChange={handleCheck} isChecked={checked}><Text color={'white'}>Manuel</Text></Checkbox>
-          {checked && <Input color={'white'} value={budgetMois.toString()} onSubmitEditing={handleSubmit} onChangeText={handleChange} keyboardType='numeric' />}
+          {checked && (
+            <HStack space={2} alignItems={'center'}>
+              <Input borderColor={'orange.500'} fontSize={20} textAlign={'center'} marginTop={2} w={'50%'} color={'white'} value={budgetMois.toString()} onSubmitEditing={handleSubmit} onChangeText={handleChange} keyboardType='numeric' />
+              <Text fontSize={20} color={'white'}>€</Text>
+            </HStack>
+          )}
 
-          <Text marginTop={30} fontSize={'20'} color={'white'}>En comptant la liste, il reste </Text>
-          <Text fontSize={'50'} color={budgetMois < 0 ? 'red.500' : 'green.500'}>{priceFormater(total)}</Text>
+          <Text marginTop={30} fontSize={'20'} color={'white'}>En comptant ton budget, il reste :</Text>
+          <Text fontSize={'50'} color={total < 0 ? 'red.500' : 'green.500'}>{priceFormater(total)}</Text>
         </Box>
 
         <Box borderWidth={1} borderColor={'white'} padding={3} borderRadius={20} marginTop={3}>
           <Text fontSize={'20'} color={'white'}>Budget course du mois</Text>
-          <Text fontSize={'40'} color={'white'}>{priceFormater(courseBudget)}</Text>
+          <Text fontSize={'40'} color={'cyan.500'}>{priceFormater(courseBudget)}</Text>
 
-          <Text marginTop={30} fontSize={'20'} color={'white'}>En comptant la liste, il reste </Text>
-          <Text fontSize={'50'} color={budgetMois < 0 ? 'red.500' : 'green.500'}>{priceFormater(availableCourse)}</Text>
+
+          <PriceSentence available={availableCourse}/>
+
         </Box>
 
       </Box>
-      <StatusBar barStyle={'light-content'} />
+      <StatusBar barStyle={'light-content'} backgroundColor={'black'}/>
     </Flex>
   );
 }
